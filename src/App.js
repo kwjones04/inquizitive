@@ -5,6 +5,7 @@ import Welcome from './pages/Welcome';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import Quiz from './pages/Quiz';
 
 export default function App() {
 
@@ -30,6 +31,7 @@ export default function App() {
                     <Route path='/login' element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} />}></Route>
                     <Route path='/signup' element={<Signup />}></Route>
                     <Route path='/home' element={<Home />}></Route>
+                    <Route path='/quiz' element={<Quiz />}></Route>
                 </Routes>
             </BrowserRouter>
         </div>

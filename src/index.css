@@ -22,6 +22,11 @@ code {
     font-family: Menlo, Monaco, Lucida Console, Courier New, monospace;
 }
 
+h1,
+h2 {
+    margin: 0;
+}
+
 input[type='button'] {
     font-family: 'Comfortaa', sans-serif;
     appearance: none;
