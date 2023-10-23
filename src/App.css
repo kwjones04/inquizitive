@@ -126,7 +126,7 @@ Quiz container
     cursor: auto;
 }
 
-#nextBtn {
+.quizContainer .mainBtn {
     background-color: #000000;
     color: #ffffff;
     font-weight: 500;

@@ -1,6 +1,52 @@
 import { useNavigate } from 'react-router-dom';
 //import { useState } from 'react';
+import React from 'react';
 import Select from 'react-select';
+
+
+class QuizForm extends React.Component {
+    
+    constructor(props) {
+        super(props);
+        this.state = {value: ''};
+    
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+
+        this.options = [
+            { value: "Option1", label: "Option 1" },
+            { value: "Option2", label: "Option 2" },
+            { value: "Option3", label: "Option 3" }
+        ]
+    }
+    
+    handleChange(selectedOption) {
+        this.setState({value: selectedOption});
+    }
+
+    handleSubmit(event) {
+        alert('A value was submitted: ' + this.state.value.value);
+        event.preventDefault();
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.handleSubmit}>
+            <Select
+                options={this.options}
+                onChange={this.handleChange}
+            />
+            <div className={'buttonContainer'}>
+                <input
+                    className={'inputButton'}
+                    type="submit"
+                    value={"Start Quiz"}
+                />
+            </div>
+            </form>
+        );
+    }
+}
 
 
 export default function Home() {
@@ -9,12 +55,7 @@ export default function Home() {
 
     //const [selected, setSelected] = useState();
 
-    const options = [
-        { value: "Option1", label: "Option 1" },
-        { value: "Option2", label: "Option 2" },
-        { value: "Option3", label: "Option 3" }
-    ]
-
+    /*
     const handleChange = (selectedOption) => {
         console.log(`Selected option: ${selectedOption}`);
     }
@@ -22,6 +63,7 @@ export default function Home() {
     const onButtonClick = () => {
         navigate('/quiz');
     }
+    */
 
     return (
         <div className={'mainContainer'}>
@@ -29,18 +71,7 @@ export default function Home() {
                 <h1>Inquizitive</h1>
             </div>
             <div className={'selectContainer'}>
-                <Select
-                    options={options}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className={'buttonContainer'}>
-                <input
-                    className={'inputButton'}
-                    type="button"
-                    onClick={onButtonClick}
-                    value={"Start Quiz"}
-                />
+                <QuizForm />
             </div>
         </div>
     );
