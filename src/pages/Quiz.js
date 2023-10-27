@@ -1,91 +1,55 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { db } from '../firebase-config';
+import { doc, getDoc } from 'firebase/firestore';
+import BackArrow from '../components/backArrow';
 
 
-export default function Quiz(props) {
+export default function Quiz() {
 
-    // Example quiz object
-    const quiz = {
-        title: "My Quiz",
-        questions: [
-            {
-                text: "What is Kyria's favorite video game?",
-                answers: [
-                    {text: "Trails in the Sky the 3rd", correct: true},
-                    {text: "Fire Emblem: Genealogy of the Holy War", correct: false},
-                    {text: "Persona 3", correct: false},
-                    {text: "Xenoblade Chronicles 3", correct: false}
-                ]
-            },
-            {
-                text: "What is Kyria's least favorite video game?",
-                answers: [
-                    {text: "Tales of Vesperia", correct: true},
-                    {text: "Persona 4 Golden", correct: false},
-                    {text: "Xenoblade Chronicles 2", correct: false},
-                    {text: "Fire Emblem Fates: Birthright", correct: false}
-                ]
-            },
-            {
-                text: "What is Kyria's favorite K-drama?",
-                answers: [
-                    {text: "Extraordinary Attorney Woo", correct: true},
-                    {text: "King the Land", correct: false},
-                    {text: "Start-Up", correct: false},
-                    {text: "Business Proposal", correct: false}
-                ]
-            },
-            {
-                text: "What is Kyria's favorite ice cream flavor?",
-                answers: [
-                    {text: "Strawberry", correct: true},
-                    {text: "Chocolate", correct: false},
-                    {text: "Vanilla", correct: false},
-                    {text: "Coffee", correct: false}
-                ]
-            },
-            {
-                text: "Who is Kyria's favorite music artist?",
-                answers: [
-                    {text: "SEVENTEEN", correct: true},
-                    {text: "Jo Stafford", correct: false},
-                    {text: "Beethoven", correct: false},
-                    {text: "Taylor Swift", correct: false}
-                ]
-            },
-        ]
-    };
+    // quiz id in search params
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
+
+    // quiz data
+    const [quiz, setQuiz] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     /*
-    STATES
+    Quiz states
     */
 
     // Current question
     const [currentIndex, setCurrentIndex] = useState(0);
-    const currentQuestion = quiz.questions[currentIndex];
 
     // Score
     const [score, setScore] = useState(0);
 
     // Number of completed questions
     const [completedQuestions, setCompletedQuestions] = useState(0);
-    const [progressWidth, setProgressWidth] = useState(0); // progress bar width
+    const [progressWidth, setProgressWidth] = useState('0%'); // progress bar width
 
     // Main btn display
     const [nextBtnDisplay, setNextBtnDisplay] = useState('none');
     const [playAgainBtnDisplay, setPlayAgainBtnDisplay] = useState('none');
 
-    // Answer button disabled
+    // Answer buttons
     const [answerBtnDisabled, setAnswerBtnDisabled] = useState(false);
     
     // Display questions or score
     const [questionDisplay, setQuestionDisplay] = useState('block');
     const [scoreDisplay, setScoreDisplay] = useState('none');
 
+    /*
+    Button click events
+    */
 
     const onAnswerButtonClick = (e) => {
         const isCorrect = e.target.value;
         if (isCorrect === 'true') {
             setScore(score + 1);
+            
         }
         setNextBtnDisplay('block');
         setAnswerBtnDisabled(true);
@@ -105,8 +69,8 @@ export default function Quiz(props) {
 
     // Next question btn
     const onNextBtnClick = () => {
-        setProgressWidth(progressWidth + 20);
         setCompletedQuestions(completedQuestions + 1);
+        setProgressWidth(`${((completedQuestions + 1) / quiz.questions.length) * 100}%`);
         setAnswerBtnDisabled(false);
         if (currentIndex < quiz.questions.length - 1) {
             setCurrentIndex(currentIndex + 1);
@@ -118,32 +82,74 @@ export default function Quiz(props) {
         setNextBtnDisplay('none');
     }
 
+    // Get quiz data
+    useEffect(() => {
+        async function getData() {
+            try {
+                const quizzesRef = doc(db, 'inquizitiveQuizzes', id);
+                const docSnap = await getDoc(quizzesRef);
+                if (docSnap.exists()) {
+                    const quizData = docSnap.data();
+                    setQuiz(quizData);
+                    setLoading(false);
+                } else {
+                    // docSnap.data() will be undefined in this case
+                    console.log("No such document!");
+                }
+            } catch (error) {
+                console.log(error.message);
+                setLoading(false);
+                setError(error);
+            }
+        }
+        getData();
+    });
+
+    if (loading) {
+        return;
+    }
+    
+    if (error) {
+        return (
+            <div className={'mainContainer'}>
+                <div className={'titleContainer'}>
+                    <h1>Sorry, there was an error!</h1>
+                </div>
+            </div>
+        );
+    }
+
+    // Current question
+    const currentQuestion = quiz.questions[currentIndex];
 
     return (
-        <div className={'quizContainer'}>
-            <p className={'progressText'}>{`${completedQuestions}/${quiz.questions.length}`}</p>
-            <div className={'progressBar'} style={{width: `${progressWidth}%`}}></div>
-            <h1>{quiz.title}</h1>
-            <div className={'questionContainer'} style={{display: questionDisplay}}>
-                <h2>{currentQuestion.text}</h2>
-                <button value={currentQuestion.answers[0].correct} onClick={onAnswerButtonClick} disabled={answerBtnDisabled}>
-                    {currentQuestion.answers[0].text}
-                </button>
-                <button value={currentQuestion.answers[1].correct} onClick={onAnswerButtonClick} disabled={answerBtnDisabled}>
-                    {currentQuestion.answers[1].text}
-                </button>
-                <button value={currentQuestion.answers[2].correct} onClick={onAnswerButtonClick} disabled={answerBtnDisabled}>
-                    {currentQuestion.answers[2].text}
-                </button>
-                <button value={currentQuestion.answers[3].correct} onClick={onAnswerButtonClick} disabled={answerBtnDisabled}>
-                    {currentQuestion.answers[3].text}
-                </button>
+        <div>
+            <BackArrow />
+            <div className={'quizContainer'}>
+                <p className={'progressText'}>{`${completedQuestions}/${quiz.questions.length}`}</p>
+                <div className={'progressBar'} style={{width: progressWidth}}></div>
+                <h1>{quiz.title}</h1>
+                <div className={'questionContainer'} style={{display: questionDisplay}}>
+                    <h2>{currentQuestion.text}</h2>
+                    <button value={currentQuestion.answers[0].correct} onClick={onAnswerButtonClick} disabled={answerBtnDisabled}>
+                        {currentQuestion.answers[0].text}
+                    </button>
+                    <button value={currentQuestion.answers[1].correct} onClick={onAnswerButtonClick} disabled={answerBtnDisabled}>
+                        {currentQuestion.answers[1].text}
+                    </button>
+                    <button value={currentQuestion.answers[2].correct} onClick={onAnswerButtonClick} disabled={answerBtnDisabled}>
+                        {currentQuestion.answers[2].text}
+                    </button>
+                    <button value={currentQuestion.answers[3].correct} onClick={onAnswerButtonClick} disabled={answerBtnDisabled}>
+                        {currentQuestion.answers[3].text}
+                    </button>
+                </div>
+                <div className={'scoreContainer'} style={{display: scoreDisplay}}>
+                    <h2>You scored {score} out of {quiz.questions.length}!</h2>
+                </div>
+                <button className={'mainBtn'} onClick={onNextBtnClick} style={{display: nextBtnDisplay}}>Next</button>
+                <button className={'mainBtn'} onClick={restartQuiz} style={{display: playAgainBtnDisplay}}>Play Again</button>
             </div>
-            <div className={'scoreContainer'} style={{display: scoreDisplay}}>
-                <h2>You scored {score} out of {quiz.questions.length}!</h2>
-            </div>
-            <button className={'mainBtn'} onClick={onNextBtnClick} style={{display: nextBtnDisplay}}>Next</button>
-            <button className={'mainBtn'} onClick={restartQuiz} style={{display: playAgainBtnDisplay}}>Play Again</button>
         </div>
     );
 }

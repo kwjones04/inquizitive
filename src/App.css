@@ -14,6 +14,7 @@
     font-family: 'Comfortaa', sans-serif;
     text-transform: lowercase;
     color: #ffffff;
+    padding: 10px;
 }
 
 .buttonContainer {
@@ -21,6 +22,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .inputContainer {
@@ -28,6 +30,7 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    padding: 10px;
 }
 
 .inputContainer > .errorLabel {
@@ -58,7 +61,7 @@
 }
 
 .selectContainer {
-    margin: 40px 0;
+    margin: 10px;
     width: 200px;
 }
 
@@ -136,14 +139,33 @@ Quiz container
     margin: 20px auto 0;
     border-radius: 4px;
     cursor: pointer;
-    /*display: none;*/
     text-align: center;
 }
 
-.correct {
-    background: #9aeabc;
+.mainBtn:hover {
+    opacity: 0.95;
 }
 
-.incorrect {
-    background: #ff9393;
+button.correct {
+    background-color: #9aeabc;
+}
+
+button.incorrect {
+    background-color: #ff9393;
+}
+
+.iconDiv {
+    font-size: 30px;
+    display: flex;
+    margin: 20px 20px 0 20px;
+}
+
+.iconDiv svg {
+    color: #ffffff;
+}
+
+.iconDiv svg:hover {
+    rotate: -360deg;
+    transition: 0.3s;
+    color: #000000;
 }

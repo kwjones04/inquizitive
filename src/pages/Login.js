@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { React, useState } from 'react';
+import { createSearchParams, useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase-config';
 import { Link } from 'react-router-dom';
@@ -21,8 +21,12 @@ export default function Login(props) {
     const signIn = () => {
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            console.log(userCredential.user.displayName);
-            navigate('/home');
+            navigate({
+                pathname: '/home',
+                search: createSearchParams({
+                    id: userCredential.user.uid
+                }).toString()
+            });
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -69,7 +73,6 @@ export default function Login(props) {
             <div className={"titleContainer"}>
                 <div>Sign in</div>
             </div>
-            <br/>
             <div className={"inputContainer"}>
                 <input
                     value={email}
@@ -79,7 +82,6 @@ export default function Login(props) {
                 />
                 <label className="errorLabel">{emailError}</label>
             </div>
-            <br/>
             <div className={"inputContainer"}>
                 <input
                     value={password}
@@ -90,7 +92,6 @@ export default function Login(props) {
                 />
                 <label className="errorLabel">{passwordError}</label>
             </div>
-            <br/>
             <div className={"inputContainer"}>
                 <input
                     className={"inputButton"}
