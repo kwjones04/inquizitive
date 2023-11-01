@@ -11,7 +11,11 @@ export default function Welcome(props) {
     const navigate = useNavigate();
 
     const onButtonClick = () => {
-        navigate('/login');
+        if (!props.loggedIn) {
+            navigate('/login');
+        } else {
+            navigate('/home');
+        }
     }
 
     return (

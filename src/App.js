@@ -11,6 +11,8 @@ export default function App() {
 
     const [loggedIn, setLoggedIn] = useState(false);
     const [email, setEmail] = useState('');
+    const [currentUserID, setCurrentUserID] = useState(null);
+    const [selected, setSelected] = useState(null);
 
     useEffect(() => {
         // Fetch the user email and token from local storage
@@ -28,10 +30,10 @@ export default function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Welcome email={email} loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}></Route>
-                    <Route path='/login' element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} />}></Route>
+                    <Route path='/login' element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} setCurrentUserID={setCurrentUserID} />}></Route>
                     <Route path='/signup' element={<Signup />}></Route>
-                    <Route path='/home' element={<Home />}></Route>
-                    <Route path='/quiz' element={<Quiz />}></Route>
+                    <Route path='/home' element={<Home currentUserID={currentUserID} setSelected={setSelected} selected={selected} />}></Route>
+                    <Route path='/quiz' element={<Quiz currentUserID={currentUserID} selected={selected} />}></Route>
                 </Routes>
             </BrowserRouter>
         </div>

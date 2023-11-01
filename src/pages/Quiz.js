@@ -1,15 +1,21 @@
 import { React, useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { db } from '../firebase-config';
 import { doc, getDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import BackArrow from '../components/backArrow';
 
 
-export default function Quiz() {
+export default function Quiz(props) {
 
-    // quiz id in search params
-    const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
+    const navigate = useNavigate();
+
+    const uid = props.currentUserID;
+    const id = props.selected;
+
+    // if no current user, navigate to welcome page
+    if (!uid) {
+        navigate('/');
+    }
 
     // quiz data
     const [quiz, setQuiz] = useState(null);

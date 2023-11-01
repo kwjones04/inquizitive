@@ -1,22 +1,23 @@
 import { React, useState, useEffect } from 'react';
-import { useSearchParams, createSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Select from 'react-select';
-//import { auth } from '../firebase-config';
 import { db } from '../firebase-config';
 import { doc, getDoc } from 'firebase/firestore';
 
 
-export default function Home() {
+export default function Home(props) {
 
     const navigate = useNavigate();
 
-    const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
+    const id = props.currentUserID;
+
+    if (!id) {
+        navigate('/');
+    }
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [userData, setUserData] = useState(null);
-    const [selected, setSelected] = useState(null);
 
     // Get user quizzes
     useEffect(() => {
@@ -26,34 +27,34 @@ export default function Home() {
                 const docSnap = await getDoc(userRef);
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
-                    //console.log(userData);
                     setUserData(userData);
                     setLoading(false);
+                    return;
                 } else {
                     // docSnap.data() will be undefined in this case
                     console.log("No such document!");
                 }
             } catch (error) {
-                console.log(error.message);
+                console.log(error);
                 setLoading(false);
                 setError(error);
+                return;
             }
         }
         getData();
-    });
+    }, [id]);
 
     const handleChange = (selectedOption) => {
         const selectedValue = selectedOption.value;
-        setSelected(selectedValue);
+        props.setSelected(selectedValue);
     }
 
     const onButtonClick = () => {
-        navigate({
-            pathname: '/quiz',
-            search: createSearchParams({
-                id: selected
-            }).toString()
-        });
+        if (!props.selected) {
+            return;
+        } else {
+            navigate('/quiz');
+        }
     }
 
     if (loading) {
@@ -97,6 +98,9 @@ export default function Home() {
                         value={"Start Quiz"}
                         onClick={onButtonClick}
                     />
+                </div>
+                <div className={'linkContainer'}>
+                    <Link to='/home'>Create new quiz</Link>
                 </div>
             </div>
         </div>

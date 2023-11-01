@@ -1,5 +1,5 @@
 import { React, useState } from 'react';
-import { createSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase-config';
 import { Link } from 'react-router-dom';
@@ -21,12 +21,8 @@ export default function Login(props) {
     const signIn = () => {
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            navigate({
-                pathname: '/home',
-                search: createSearchParams({
-                    id: userCredential.user.uid
-                }).toString()
-            });
+            navigate('/home');
+            props.setCurrentUserID(userCredential.user.uid);
         })
         .catch((error) => {
             const errorCode = error.code;
